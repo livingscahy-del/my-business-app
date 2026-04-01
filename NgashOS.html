@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0f5c47"/>
+<title>AccountPro — Business Accounting</title>
+<style>
+:root{
+  --p:#0f5c47;--p2:#1d9e75;--pl:#e1f5ee;--p3:#085041;
+  --r:#d85a30;--rl:#faece7;--r2:#993c1d;
+  --a:#ba7517;--al:#faeeda;
+  --b:#185fa5;--bl:#e6f1fb;
+  --g0:#ffffff;--g1:#f8f7f4;--g2:#f1efe8;--g3:#d3d1c7;
+  --g4:#888780;--g5:#444441;--g6:#1a1a18;
+  --rad:12px;--rads:8px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--g1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:var(--g6);font-size:15px}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+/* Layout */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:200px;background:var(--p3);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-logo{padding:1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo-name{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sidebar-logo-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.sidebar-nav{flex:1;padding:.5rem 0}
+.snav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 1rem;background:none;border:none;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;cursor:pointer;border-radius:0;transition:all .15s;text-align:left}
+.snav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.snav-btn.active{background:rgba(255,255,255,.15);color:#fff;font-weight:600}
+.snav-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--g0);border-bottom:1px solid var(--g2);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:700;color:var(--g6)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.biz-name{font-size:13px;color:var(--g4);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cur-sel{background:var(--g1);border:1px solid var(--g3);border-radius:var(--rads);padding:5px 8px;font-size:13px;font-weight:600;color:var(--p);cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:1.25rem}
+/* Mobile nav */
+.mob-nav{display:none;background:var(--p3);position:fixed;bottom:0;left:0;right:0;z-index:200;overflow-x:auto;padding:0}
+.mob-nav-inner{display:flex;min-width:max-content}
+.mnav-btn{flex-shrink:0;background:none;border:none;color:rgba(255,255,255,.6);padding:8px 14px;font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;letter-spacing:.03em}
+.mnav-btn .mi{font-size:18px}
+.mnav-btn.active{color:#fff}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .mob-nav{display:block}
+  .content{padding:1rem;padding-bottom:70px}
+  .topbar{padding:.6rem 1rem}
+}
+/* Cards & layout */
+.card{background:var(--g0);border-radius:var(--rad);box-shadow:var(--sh);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:13px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:640px){.grid3,.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr 1fr}}
+/* Metric cards */
+.mc{background:var(--g2);border-radius:var(--rads);padding:12px 14px}
+.mc-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--g4);margin-bottom:4px}
+.mc-val{font-size:21px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.mc-sub{font-size:11px;color:var(--g4);margin-top:2px}
+.mc-full{grid-column:1/-1}
+.green{color:var(--p2)}.red{color:var(--r)}.amber{color:var(--a)}.blue{color:var(--b)}
+/* Forms */
+.field{margin-bottom:.9rem}
+.field label,.flabel{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--g4);margin-bottom:5px}
+.field input,.field select,.field textarea,input.fi,select.fi{width:100%;padding:9px 11px;border:1.5px solid var(--g3);border-radius:var(--rads);font-size:14px;background:var(--g0);color:var(--g6);outline:none;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus,input.fi:focus,select.fi:focus{border-color:var(--p2)}
+.field textarea{resize:vertical;min-height:70px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.frow{grid-template-columns:1fr}}
+/* Buttons */
+.btn{padding:9px 16px;border-radius:var(--rads);border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--p);color:#fff}
+.btn-primary:hover{background:var(--p3)}
+.btn-secondary{background:var(--g2);color:var(--g5)}
+.btn-secondary:hover{background:var(--g3)}
+.btn-danger{background:var(--rl);color:var(--r2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-full{width:100%;justify-content:center;padding:11px}
+.btn-dark{background:var(--g6);color:#fff}
+/* Toggle */
+.toggle{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--g3);border-radius:var(--rads);overflow:hidden;margin-bottom:1rem}
+.tgl-btn{padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:none;color:var(--g4);transition:all .15s}
+.tgl-btn.active-inc{background:var(--pl);color:var(--p)}
+.tgl-btn.active-exp{background:var(--rl);color:var(--r2)}
+.tgl-btn.active-b{background:var(--bl);color:var(--b)}
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--g4);border-bottom:1.5px solid var(--g2)}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--g2);color:var(--g5);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--g1)}
+.tbl-wrap{overflow-x:auto}
+/* Badges */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:var(--pl);color:var(--p)}
+.badge-red{background:var(--rl);color:var(--r2)}
+.badge-amber{background:var(--al);color:var(--a)}
+.badge-blue{background:var(--bl);color:var(--b)}
+.badge-gray{background:var(--g2);color:var(--g4)}
+/* List items */
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--g0);border-radius:var(--rads);box-shadow:var(--sh);margin-bottom:6px}
+.tx-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tx-ico.inc{background:var(--pl)}.tx-ico.exp{background:var(--rl)}
+.tx-body{flex:1;min-width:0}
+.tx-desc{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:11px;color:var(--g4);margin-top:1px}
+.tx-amt{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;flex-shrink:0}
+.tx-del{background:none;border:none;color:var(--g3);cursor:pointer;font-size:18px;padding:2px 5px;flex-shrink:0}
+.tx-del:active{color:var(--r)}
+/* Chart */
+.chart-wrap{position:relative;height:220px;width:100%}
+/* Empty */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--g4)}
+.empty-ico{font-size:32px;margin-bottom:8px}
+.empty-txt{font-size:13px;line-height:1.6}
+/* Divider */
+.divider{border:none;border-top:1px solid var(--g2);margin:1rem 0}
+/* Section header */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.sec-title{font-size:13px;font-weight:700;color:var(--g5)}
+/* Filter chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.chip{padding:4px 12px;border-radius:20px;border:1.5px solid var(--g3);background:var(--g0);font-size:12px;font-weight:600;color:var(--g4);cursor:pointer;white-space:nowrap}
+.chip.active{background:var(--p);border-color:var(--p);color:#fff}
+/* Invoice */
+.inv-header{background:var(--p3);color:#fff;border-radius:var(--rad) var(--rad) 0 0;padding:1.25rem;margin:-1.25rem -1.25rem 1.25rem}
+.inv-title{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.inv-sub{font-size:12px;opacity:.7;margin-top:2px}
+/* Payroll result */
+.pay-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g2);font-size:13px}
+.pay-row:last-child{border-bottom:none}
+.pay-row.total{font-weight:700;font-size:14px;color:var(--p);padding-top:10px}
+.pay-row.deduct{color:var(--r)}
+/* Progress bar */
+.pbar{height:6px;background:var(--g2);border-radius:3px;overflow:hidden;margin-top:4px}
+.pbar-fill{height:100%;border-radius:3px;transition:width .4s}
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--g6);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;transition:transform .2s;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(min-width:641px){.toast{bottom:24px}}
+/* P&L statement */
+.pl-section{margin-bottom:1rem}
+.pl-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--g2)}
+.pl-row:last-child{border-bottom:none}
+.pl-row.indent{padding-left:1rem;color:var(--g4)}
+.pl-row.subtotal{font-weight:700;background:var(--g1);padding:7px 8px;border-radius:4px;margin:4px 0}
+.pl-row.total{font-weight:700;font-size:15px;background:var(--p3);color:#fff;padding:9px 10px;border-radius:var(--rads);margin-top:6px}
+/* AI box */
+.ai-box{background:var(--pl);border-left:3px solid var(--p2);border-radius:0 var(--rads) var(--rads) 0;padding:1rem;margin-top:1rem;font-size:13px;line-height:1.7;color:var(--g5);white-space:pre-wrap;display:none}
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- Sidebar (desktop) -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-name">📒 AccountPro</div>
+      <div class="sidebar-logo-sub" id="biz-sub">My Business</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="snav-btn active" onclick="go('dashboard',this)"><span class="snav-icon">🏠</span>Dashboard</button>
+      <button class="snav-btn" onclick="go('cashflow',this)"><span class="snav-icon">💰</span>Cashflow</button>
+      <button class="snav-btn" onclick="go('pl',this)"><span class="snav-icon">📊</span>Profit & Loss</button>
+      <button class="snav-btn" onclick="go('tax',this)"><span class="snav-icon">🧾</span>Tax</button>
+      <button class="snav-btn" onclick="go('invoices',this)"><span class="snav-icon">📄</span>Invoices</button>
+      <button class="snav-btn" onclick="go('inventory',this)"><span class="snav-icon">📦</span>Inventory</button>
+      <button class="snav-btn" onclick="go('payroll',this)"><span class="snav-icon">👥</span>Payroll</button>
+      <button class="snav-btn" onclick="go('balance',this)"><span class="snav-icon">⚖️</span>Balance Sheet</button>
+      <button class="snav-btn" onclick="go('reports',this)"><span class="snav-icon">📈</span>Reports</button>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="biz-name" id="biz-name-top" onclick="editBizName()" title="Click to edit business name" style="cursor:pointer"></span>
+        <select class="cur-sel" id="cur-sel" onchange="setCurrency(this.value)">
+          <option value="KES">KES</option><option value="USD">USD</option>
+          <option value="GBP">GBP</option><option value="EUR">EUR</option>
+          <option value="NGN">NGN</option><option value="UGX">UGX</option>
+          <option value="TZS">TZS</option>
+        </select>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- Mobile nav -->
+<nav class="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mnav-btn active" onclick="go('dashboard',this)"><span class="mi">🏠</span>Home</button>
+    <button class="mnav-btn" onclick="go('cashflow',this)"><span class="mi">💰</span>Cashflow</button>
+    <button class="mnav-btn" onclick="go('pl',this)"><span class="mi">📊</span>P&L</button>
+    <button class="mnav-btn" onclick="go('tax',this)"><span class="mi">🧾</span>Tax</button>
+    <button class="mnav-btn" onclick="go('invoices',this)"><span class="mi">📄</span>Invoices</button>
+    <button class="mnav-btn" onclick="go('inventory',this)"><span class="mi">📦</span>Stock</button>
+    <button class="mnav-btn" onclick="go('payroll',this)"><span class="mi">👥</span>Payroll</button>
+    <button class="mnav-btn" onclick="go('balance',this)"><span class="mi">⚖️</span>Balance</button>
+    <button class="mnav-btn" onclick="go('reports',this)"><span class="mi">📈</span>Reports</button>
+  </div>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE & PERSISTENCE
+// ═══════════════════════════════════════════════════════════
+let S = {
+  currency:'KES', bizName:'My Business', tab:'dashboard',
+  txs:[], invoices:[], inventory:[], employees:[], assets:[], liabilities:[],
+  cfType:'income', invItem:{items:[]}, payResult:null
+};
+
+const KEYS = {txs:'ap_txs',invoices:'ap_inv',inventory:'ap_stock',employees:'ap_emp',assets:'ap_assets',liabilities:'ap_liab',settings:'ap_settings'};
+
+function saveAll(){
+  try{
+    localStorage.setItem(KEYS.txs,JSON.stringify(S.txs));
+    localStorage.setItem(KEYS.invoices,JSON.stringify(S.invoices));
+    localStorage.setItem(KEYS.inventory,JSON.stringify(S.inventory));
+    localStorage.setItem(KEYS.employees,JSON.stringify(S.employees));
+    localStorage.setItem(KEYS.assets,JSON.stringify(S.assets));
+    localStorage.setItem(KEYS.liabilities,JSON.stringify(S.liabilities));
+    localStorage.setItem(KEYS.settings,JSON.stringify({currency:S.currency,bizName:S.bizName}));
+  }catch(e){}
+}
+
+function loadAll(){
+  try{
+    const p=k=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; }};
+    S.txs=p(KEYS.txs)||[];
+    S.invoices=p(KEYS.invoices)||[];
+    S.inventory=p(KEYS.stock)||p(KEYS.inventory)||[];
+    S.employees=p(KEYS.employees)||[];
+    S.assets=p(KEYS.assets)||[];
+    S.liabilities=p(KEYS.liabilities)||[];
+    const st=p(KEYS.settings);
+    if(st){ S.currency=st.currency||'KES'; S.bizName=st.bizName||'My Business'; }
+    document.getElementById('cur-sel').value=S.currency;
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+const C = n => S.currency+' '+Math.abs(Math.round(n)).toLocaleString();
+const CS = n => (n<0?'- ':'+ ')+S.currency+' '+Math.abs(Math.round(n)).toLocaleString();
+const Cfmt = n => { const a=Math.abs(Math.round(n)); return S.currency+(a>=1e6?(a/1e6).toFixed(1)+'M':a>=1e3?(a/1e3).toFixed(1)+'k':a.toLocaleString()); };
+const fdate = d => { try{ return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }catch(e){ return d; }};
+const today = () => new Date().toISOString().split('T')[0];
+const uid = () => Date.now()+''+Math.random().toString(36).slice(2,6);
+
+let _chart = null;
+function destroyChart(){ if(_chart){ _chart.destroy(); _chart=null; }}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function setCurrency(c){ S.currency=c; saveAll(); render(); }
+function editBizName(){
+  const n=prompt('Business name:',S.bizName);
+  if(n&&n.trim()){ S.bizName=n.trim(); saveAll(); updateTopbar(); }
+}
+function updateTopbar(){
+  document.getElementById('biz-name-top').textContent=S.bizName;
+  document.getElementById('biz-sub').textContent=S.bizName;
+}
+
+// Income & expense categories
+const INC_CATS=['Sales revenue','Service income','Consulting fee','Loan received','Investment income','Grant / donation','Rental income','Commission','Refund','Other income'];
+const EXP_CATS=['Cost of goods sold','Rent / lease','Salaries & wages','Inventory / supplies','Utilities','Marketing & ads','Transport','Equipment','Taxes & levies','Loan repayment','Maintenance','Communication','Insurance','Professional fees','Meals & entertainment','Other expenses'];
+const CAT_ICO={'Sales revenue':'💰','Service income':'🛠','Consulting fee':'💼','Loan received':'🏦','Investment income':'📈','Grant / donation':'🎁','Rental income':'🏠','Commission':'🤝','Refund':'↩️','Other income':'✦','Cost of goods sold':'🏭','Rent / lease':'🏢','Salaries & wages':'👥','Inventory / supplies':'📦','Utilities':'💡','Marketing & ads':'📣','Transport':'🚗','Equipment':'⚙️','Taxes & levies':'🧾','Loan repayment':'💳','Maintenance':'🔧','Communication':'📱','Insurance':'🛡','Professional fees':'📋','Meals & entertainment':'🍽','Other expenses':'📌'};
+
+// ═══════════════════════════════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════════════════════════════
+const TABS = {dashboard:'Dashboard',cashflow:'Cashflow',pl:'Profit & Loss',tax:'Tax',invoices:'Invoices',inventory:'Inventory',payroll:'Payroll',balance:'Balance Sheet',reports:'Reports'};
+function go(name,btn){
+  destroyChart();
+  S.tab=name;
+  document.querySelectorAll('.snav-btn,.mnav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('topbar-title').textContent=TABS[name]||name;
+  render();
+}
+function render(){ window['render_'+S.tab]?.(); }
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function render_dashboard(){
+  const inc=S.txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=S.txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=inc-exp;
+  const invVal=S.inventory.reduce((s,i)=>s+(i.qty*i.costPrice),0);
+  const invOutstanding=S.invoices.filter(i=>i.status==='unpaid').reduce((s,i)=>s+i.total,0);
+  const empCount=S.employees.length;
+  const now=new Date(); const m=now.getMonth(),y=now.getFullYear();
+  const mInc=S.txs.filter(t=>t.type==='income'&&new Date(t.date+'T12:00:00').getMonth()===m&&new Date(t.date+'T12:00:00').getFullYear()===y).reduce((s,t)=>s+t.amount,0);
+  const mExp=S.txs.filter(t=>t.type==='expense'&&new Date(t.date+'T12:00:00').getMonth()===m&&new Date(t.date+'T12:00:00').getFullYear()===y).reduce((s,t)=>s+t.amount,0);
+
+  document.getElementById('content').innerHTML=`
+    <div class="grid4" style="margin-bottom:1rem">
+      <div class="mc mc-full"><div class="mc-label">Net cashflow (all time)</div><div class="mc-val ${net>=0?'green':'red'}">${net>=0?'+':''}${C(net)}</div><div class="mc-sub">${net>=0?'Surplus — business is cash positive':'Deficit — expenses exceed income'}</div></div>
+      <div class="mc"><div class="mc-label">Total income</div><div class="mc-val green">${Cfmt(inc)}</div></div>
+      <div class="mc"><div class="mc-label">Total expenses</div><div class="mc-val red">${Cfmt(exp)}</div></div>
+      <div class="mc"><div class="mc-label">This month income</div><div class="mc-val green">${Cfmt(mInc)}</div></div>
+      <div class="mc"><div class="mc-label">This month expenses</div><div class="mc-val red">${Cfmt(mExp)}</div></div>
+      <div class="mc"><div class="mc-label">Invoices outstanding</div><div class="mc-val amber">${Cfmt(invOutstanding)}</div></div>
+      <div class="mc"><div class="mc-label">Inventory value</div><div class="mc-val blue">${Cfmt(invVal)}</div></div>
+      <div class="mc"><div class="mc-label">Employees on payroll</div><div class="mc-val">${empCount}</div></div>
+      <div class="mc"><div class="mc-label">Low stock alerts</div><div class="mc-val red">${S.inventory.filter(i=>i.qty<=i.reorder).length}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monthly cashflow (last 6 months)</div>
+      ${S.txs.length?`<div class="chart-wrap"><canvas id="dash-c"></canvas></div>`:'<div class="empty"><div class="empty-ico">📊</div><div class="empty-txt">Add transactions to see your chart</div></div>'}
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Recent transactions</div>
+        ${S.txs.slice(0,4).map(t=>`<div class="tx-item"><div class="tx-ico ${t.type}">${CAT_ICO[t.category]||'📌'}</div><div class="tx-body"><div class="tx-desc">${t.description}</div><div class="tx-meta">${t.category}</div></div><div class="tx-amt ${t.type==='income'?'green':'red'}">${t.type==='income'?'+':'-'} ${C(t.amount)}</div></div>`).join('')||'<div class="empty"><div class="empty-txt">No transactions yet</div></div>'}
+      </div>
+      <div class="card">
+        <div class="card-title">Recent invoices</div>
+        ${S.invoices.slice(0,4).map(i=>`<div class="tx-item"><div class="tx-ico inc">📄</div><div class="tx-body"><div class="tx-desc">${i.client}</div><div class="tx-meta">${i.number}</div></div><div style="text-align:right"><div class="tx-amt ${i.status==='paid'?'green':'amber'}">${C(i.total)}</div><div><span class="badge badge-${i.status==='paid'?'green':'amber'}">${i.status}</span></div></div></div>`).join('')||'<div class="empty"><div class="empty-txt">No invoices yet</div></div>'}
+      </div>
+    </div>`;
+  if(S.txs.length) setTimeout(drawDashChart,50);
+}
+
+function drawDashChart(){
+  const months={};
+  S.txs.forEach(t=>{ const d=new Date(t.date+'T12:00:00'); const k=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0'); const lb=d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}); if(!months[k])months[k]={lb,inc:0,exp:0}; if(t.type==='income')months[k].inc+=t.amount; else months[k].exp+=t.amount; });
+  const sorted=Object.keys(months).sort().slice(-6);
+  if(!sorted.length)return;
+  const el=document.getElementById('dash-c'); if(!el)return;
+  _chart=new Chart(el.getContext('2d'),{type:'bar',data:{labels:sorted.map(k=>months[k].lb),datasets:[{label:'Income',data:sorted.map(k=>Math.round(months[k].inc)),backgroundColor:'#1d9e7530',borderColor:'#1d9e75',borderWidth:1.5,borderRadius:4},{label:'Expenses',data:sorted.map(k=>Math.round(months[k].exp)),backgroundColor:'#d85a3030',borderColor:'#d85a30',borderWidth:1.5,borderRadius:4},{label:'Net',data:sorted.map(k=>Math.round(months[k].inc-months[k].exp)),type:'line',borderColor:'#185fa5',borderWidth:2,pointRadius:3,pointBackgroundColor:'#185fa5',fill:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${S.currency} ${Math.abs(ctx.raw).toLocaleString()}`}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},autoSkip:false,maxRotation:0}},y:{grid:{color:'#f0efe8'},ticks:{font:{size:10},callback:v=>{const a=Math.abs(v);return(v<0?'-':'')+S.currency+(a>=1e6?(a/1e6).toFixed(1)+'M':a>=1e3?(a/1e3).toFixed(0)+'k':a);}}}}}});
+}
+
+// ═══════════════════════════════════════════════════════════
+// CASHFLOW
+// ═══════════════════════════════════════════════════════════
+function render_cashflow(){
+  const cats=S.cfType==='income'?INC_CATS:EXP_CATS;
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="toggle">
+        <button class="tgl-btn ${S.cfType==='income'?'active-inc':''}" onclick="S.cfType='income';render_cashflow()">＋ Income</button>
+        <button class="tgl-btn ${S.cfType==='expense'?'active-exp':''}" onclick="S.cfType='expense';render_cashflow()">－ Expense</button>
+      </div>
+      <div class="frow">
+        <div class="field"><label>Amount (${S.currency})</label><input type="number" id="cf-amt" placeholder="0" min="0" inputmode="decimal"/></div>
+        <div class="field"><label>Date</label><input type="date" id="cf-date" value="${today()}"/></div>
+      </div>
+      <div class="frow">
+        <div class="field"><label>Category</label><select id="cf-cat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div class="field"><label>Description</label><input type="text" id="cf-desc" placeholder="e.g. Invoice from ABC Ltd" maxlength="80"/></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addTx()">Add ${S.cfType}</button>
+    </div>
+    <div class="card">
+      <div class="card-title">All transactions</div>
+      <div id="cf-list">${renderTxList(S.txs,'cf-list')}</div>
+    </div>`;
+}
+
+function renderTxList(txs, ctxId){
+  if(!txs.length) return '<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No transactions yet</div></div>';
+  return txs.slice(0,60).map(t=>`<div class="tx-item"><div class="tx-ico ${t.type}">${CAT_ICO[t.category]||'📌'}</div><div class="tx-body"><div class="tx-desc">${t.description}</div><div class="tx-meta">${t.category} · ${fdate(t.date)}</div></div><div class="tx-amt ${t.type==='income'?'green':'red'}">${t.type==='income'?'+':'-'} ${C(t.amount)}</div><button class="tx-del" onclick="delTx('${t.id}')">×</button></div>`).join('');
+}
+
+function addTx(){
+  const amt=parseFloat(document.getElementById('cf-amt')?.value||0);
+  const date=document.getElementById('cf-date')?.value;
+  const cat=document.getElementById('cf-cat')?.value;
+  const desc=(document.getElementById('cf-desc')?.value||'').trim()||cat;
+  if(!amt||amt<=0){toast('Enter a valid amount');return;}
+  if(!date){toast('Select a date');return;}
+  S.txs.unshift({id:uid(),type:S.cfType,amount:amt,date,category:cat,description:desc});
+  saveAll(); toast('Transaction added!');
+  document.getElementById('cf-amt').value='';
+  document.getElementById('cf-desc').value='';
+  const listEl=document.getElementById('cf-list');
+  if(listEl) listEl.innerHTML=renderTxList(S.txs,'cf-list');
+}
+
+function delTx(id){
+  if(!confirm('Delete this transaction?'))return;
+  S.txs=S.txs.filter(t=>t.id!==id);
+  saveAll(); toast('Deleted');
+  const listEl=document.getElementById('cf-list');
+  if(listEl) listEl.innerHTML=renderTxList(S.txs,'cf-list');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROFIT & LOSS
+// ═══════════════════════════════════════════════════════════
+function render_pl(){
+  const now=new Date(); let m=parseInt(document.getElementById('pl-month-sel')?.value||now.getMonth()), y=parseInt(document.getElementById('pl-year-sel')?.value||now.getFullYear());
+  const months=[...Array(12)].map((_,i)=>new Date(2020,i,1).toLocaleDateString('en-GB',{month:'long'}));
+  const years=[...Array(5)].map((_,i)=>now.getFullYear()-2+i);
+
+  // Calculate
+  const filtered = (type,cats) => S.txs.filter(t=>{
+    const d=new Date(t.date+'T12:00:00');
+    return t.type===type&&(document.getElementById('pl-full')?.checked||(d.getMonth()===m&&d.getFullYear()===y));
+  });
+
+  // P&L categories mapping
+  const revenue=S.txs.filter(t=>{
+    const d=new Date(t.date+'T12:00:00');
+    const inPeriod=document.getElementById('pl-full')?.checked||(d.getMonth()===m&&d.getFullYear()===y);
+    return t.type==='income'&&inPeriod;
+  });
+  const expenses=S.txs.filter(t=>{
+    const d=new Date(t.date+'T12:00:00');
+    const inPeriod=document.getElementById('pl-full')?.checked||(d.getMonth()===m&&d.getFullYear()===y);
+    return t.type==='expense'&&inPeriod;
+  });
+
+  const totalRev=revenue.reduce((s,t)=>s+t.amount,0);
+  const cogs=expenses.filter(t=>t.category==='Cost of goods sold').reduce((s,t)=>s+t.amount,0);
+  const grossProfit=totalRev-cogs;
+  const opExp=expenses.filter(t=>t.category!=='Cost of goods sold').reduce((s,t)=>s+t.amount,0);
+  const netProfit=grossProfit-opExp;
+
+  // Group revenue by category
+  const revByCat={};
+  revenue.forEach(t=>revByCat[t.category]=(revByCat[t.category]||0)+t.amount);
+  const expByCat={};
+  expenses.forEach(t=>expByCat[t.category]=(expByCat[t.category]||0)+t.amount);
+
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.75rem">
+        <select class="fi" style="width:auto" id="pl-month-sel" onchange="render_pl()">${months.map((mn,i)=>`<option value="${i}" ${i===m?'selected':''}>${mn}</option>`).join('')}</select>
+        <select class="fi" style="width:auto" id="pl-year-sel" onchange="render_pl()">${years.map(yr=>`<option value="${yr}" ${yr===y?'selected':''}>${yr}</option>`).join('')}</select>
+        <label style="font-size:13px;color:var(--g4);display:flex;align-items:center;gap:5px"><input type="checkbox" id="pl-full" onchange="render_pl()"> All time</label>
+      </div>
+      <div class="inv-header"><div class="inv-title">Profit & Loss Statement</div><div class="inv-sub">${S.bizName} · ${document.getElementById('pl-full')?.checked?'All time':months[m]+' '+y}</div></div>
+
+      <div class="pl-section">
+        <div class="pl-row subtotal" style="background:var(--pl);color:var(--p)"><span>REVENUE</span><span></span></div>
+        ${Object.entries(revByCat).map(([k,v])=>`<div class="pl-row indent"><span>${CAT_ICO[k]||'•'} ${k}</span><span>${C(v)}</span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">No revenue entries</span><span>—</span></div>'}
+        <div class="pl-row subtotal"><span>Total Revenue</span><span>${C(totalRev)}</span></div>
+      </div>
+
+      <div class="pl-section">
+        <div class="pl-row subtotal" style="background:var(--rl);color:var(--r2)"><span>COST OF GOODS SOLD</span><span></span></div>
+        <div class="pl-row indent"><span>Cost of goods sold</span><span>${C(cogs)}</span></div>
+        <div class="pl-row subtotal"><span>Gross Profit</span><span class="${grossProfit>=0?'green':'red'}">${CS(grossProfit)}</span></div>
+      </div>
+
+      <div class="pl-section">
+        <div class="pl-row subtotal" style="background:var(--rl);color:var(--r2)"><span>OPERATING EXPENSES</span><span></span></div>
+        ${Object.entries(expByCat).filter(([k])=>k!=='Cost of goods sold').map(([k,v])=>`<div class="pl-row indent"><span>${CAT_ICO[k]||'•'} ${k}</span><span>${C(v)}</span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">No expense entries</span><span>—</span></div>'}
+        <div class="pl-row subtotal"><span>Total Operating Expenses</span><span>${C(opExp)}</span></div>
+      </div>
+
+      <div class="pl-row total"><span>NET PROFIT / LOSS</span><span class="${netProfit>=0?'':'red'}">${CS(netProfit)}</span></div>
+      ${netProfit!==0?`<div style="margin-top:.75rem;padding:.75rem;background:${netProfit>=0?'var(--pl)':'var(--rl)'};border-radius:var(--rads);font-size:13px;color:${netProfit>=0?'var(--p)':'var(--r2)'}">
+        ${netProfit>=0?'✅ Business is profitable.':'⚠️ Business is running at a loss.'} Gross margin: ${totalRev>0?Math.round((grossProfit/totalRev)*100):0}% · Net margin: ${totalRev>0?Math.round((netProfit/totalRev)*100):0}%
+      </div>`:''}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TAX
+// ═══════════════════════════════════════════════════════════
+function render_tax(){
+  document.getElementById('content').innerHTML=`
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">🧾 VAT Calculator (16%)</div>
+        <div class="toggle">
+          <button class="tgl-btn" id="vat-exc-btn" onclick="setVatMode('excl')">Excl. VAT</button>
+          <button class="tgl-btn active-b" id="vat-inc-btn" onclick="setVatMode('incl')">Incl. VAT</button>
+        </div>
+        <div class="field"><label id="vat-label">Amount (incl. VAT, KES)</label><input type="number" id="vat-amt" placeholder="0" inputmode="decimal" oninput="calcVAT()"/></div>
+        <div style="background:var(--g1);border-radius:var(--rads);padding:1rem">
+          <div class="pay-row"><span>Net amount (excl. VAT)</span><span id="vat-net" style="font-weight:600">—</span></div>
+          <div class="pay-row"><span>VAT (16%)</span><span id="vat-tax" style="font-weight:600;color:var(--a)">—</span></div>
+          <div class="pay-row total"><span>Total amount</span><span id="vat-total">—</span></div>
+        </div>
+        <div style="margin-top:.75rem;font-size:12px;color:var(--g4);line-height:1.6">
+          <strong>Kenya VAT rules:</strong> Standard rate 16%. Zero-rated: exports, basic food items. Exempt: financial services, insurance, land. VAT returns due 20th of following month.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💼 PAYE Calculator (Kenya 2024)</div>
+        <div class="field"><label>Gross monthly salary (KES)</label><input type="number" id="paye-gross" placeholder="e.g. 50000" inputmode="decimal" oninput="calcPAYE()"/></div>
+        <div id="paye-result" style="background:var(--g1);border-radius:var(--rads);padding:1rem">
+          <div style="text-align:center;color:var(--g4);font-size:13px;padding:1rem 0">Enter gross salary above</div>
+        </div>
+        <div style="margin-top:.75rem;font-size:12px;color:var(--g4);line-height:1.6">
+          <strong>PAYE bands 2024:</strong> 0–24K @ 10% · 24K–32.3K @ 25% · 32.3K–500K @ 30% · 500K–800K @ 32.5% · 800K+ @ 35%. Personal relief: KES 2,400/month.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Estimated tax liability from transactions</div>
+      ${buildTaxSummary()}
+    </div>`;
+}
+
+let vatMode='incl';
+function setVatMode(m){
+  vatMode=m;
+  document.getElementById('vat-exc-btn').className='tgl-btn'+(m==='excl'?' active-b':'');
+  document.getElementById('vat-inc-btn').className='tgl-btn'+(m==='incl'?' active-b':'');
+  document.getElementById('vat-label').textContent=`Amount (${m==='incl'?'incl.':'excl.'} VAT, ${S.currency})`;
+  calcVAT();
+}
+function calcVAT(){
+  const v=parseFloat(document.getElementById('vat-amt')?.value||0);
+  if(!v){['vat-net','vat-tax','vat-total'].forEach(id=>document.getElementById(id).textContent='—');return;}
+  let net,tax,total;
+  if(vatMode==='incl'){ total=v; net=v/1.16; tax=v-net; }
+  else { net=v; tax=v*0.16; total=v+tax; }
+  document.getElementById('vat-net').textContent=S.currency+' '+Math.round(net).toLocaleString();
+  document.getElementById('vat-tax').textContent=S.currency+' '+Math.round(tax).toLocaleString();
+  document.getElementById('vat-total').textContent=S.currency+' '+Math.round(total).toLocaleString();
+}
+
+function calcPAYE(){
+  const gross=parseFloat(document.getElementById('paye-gross')?.value||0);
+  const el=document.getElementById('paye-result');
+  if(!gross||gross<=0){el.innerHTML='<div style="text-align:center;color:var(--g4);font-size:13px;padding:1rem 0">Enter gross salary above</div>';return;}
+  // NSSF (new 2023 act)
+  const nssf1=Math.min(gross,7000)*0.06;
+  const nssf2=Math.max(0,Math.min(gross,36000)-7000)*0.06;
+  const nssf=Math.round(nssf1+nssf2);
+  // SHIF at 2.75%
+  const shif=Math.round(gross*0.0275);
+  // Taxable = gross - NSSF
+  const taxable=gross-nssf;
+  // PAYE bands
+  let paye=0;
+  if(taxable>800000) paye+=(taxable-800000)*0.35;
+  if(taxable>500000) paye+=Math.min(taxable-500000,300000)*0.325;
+  if(taxable>32333) paye+=Math.min(taxable-32333,467667)*0.30;
+  if(taxable>24000) paye+=Math.min(taxable-24000,8333)*0.25;
+  paye+=Math.min(taxable,24000)*0.10;
+  paye=Math.max(0,Math.round(paye-2400)); // personal relief
+  const net=Math.round(gross-paye-nssf-shif);
+  el.innerHTML=`
+    <div class="pay-row"><span>Gross salary</span><span style="font-weight:600">${S.currency} ${Math.round(gross).toLocaleString()}</span></div>
+    <div class="pay-row deduct"><span>PAYE tax</span><span>− ${S.currency} ${paye.toLocaleString()}</span></div>
+    <div class="pay-row deduct"><span>NSSF (Tier I+II)</span><span>− ${S.currency} ${nssf.toLocaleString()}</span></div>
+    <div class="pay-row deduct"><span>SHIF (2.75%)</span><span>− ${S.currency} ${shif.toLocaleString()}</span></div>
+    <div class="pay-row" style="border-bottom:1.5px solid var(--g3)"><span>Total deductions</span><span style="color:var(--r2);font-weight:600">${S.currency} ${(paye+nssf+shif).toLocaleString()}</span></div>
+    <div class="pay-row total"><span>Net take-home pay</span><span>${S.currency} ${net.toLocaleString()}</span></div>
+    <div style="margin-top:.5rem"><div class="pbar"><div class="pbar-fill" style="width:${Math.round((net/gross)*100)}%;background:var(--p2)"></div></div><div style="font-size:11px;color:var(--g4);margin-top:3px">${Math.round((net/gross)*100)}% take-home ratio</div></div>`;
+}
+
+function buildTaxSummary(){
+  const inc=S.txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=S.txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const netProfit=inc-exp;
+  const vatOnSales=Math.round(inc*0.16/1.16);
+  const vatOnPurchases=Math.round(exp*0.16/1.16);
+  const vatPayable=Math.max(0,vatOnSales-vatOnPurchases);
+  const corpTax=netProfit>0?Math.round(netProfit*0.30):0;
+  if(!S.txs.length) return '<div class="empty"><div class="empty-txt">Add transactions to see your estimated tax liability</div></div>';
+  return `<div class="grid3">
+    <div class="mc"><div class="mc-label">VAT on sales (output)</div><div class="mc-val amber">${C(vatOnSales)}</div><div class="mc-sub">16% of revenue</div></div>
+    <div class="mc"><div class="mc-label">VAT on purchases (input)</div><div class="mc-val blue">${C(vatOnPurchases)}</div><div class="mc-sub">16% of expenses</div></div>
+    <div class="mc"><div class="mc-label">VAT payable (net)</div><div class="mc-val ${vatPayable>0?'red':'green'}">${C(vatPayable)}</div><div class="mc-sub">${vatPayable>0?'Amount owed to KRA':'No VAT payable'}</div></div>
+    <div class="mc"><div class="mc-label">Net profit / (loss)</div><div class="mc-val ${netProfit>=0?'green':'red'}">${CS(netProfit)}</div></div>
+    <div class="mc"><div class="mc-label">Corp. tax est. (30%)</div><div class="mc-val amber">${C(corpTax)}</div><div class="mc-sub">${netProfit<=0?'No tax (loss-making)':'Based on net profit'}</div></div>
+    <div class="mc"><div class="mc-label">After-tax profit est.</div><div class="mc-val ${(netProfit-corpTax)>=0?'green':'red'}">${C(netProfit-corpTax)}</div></div>
+  </div>
+  <div style="margin-top:.75rem;padding:.75rem;background:var(--al);border-radius:var(--rads);font-size:12px;color:var(--a);line-height:1.6">
+    ⚠️ These are estimates for planning purposes only. Consult a certified accountant or KRA for actual tax obligations.
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INVOICES
+// ═══════════════════════════════════════════════════════════
+let editingInvoice=null;
+function render_invoices(){
+  if(editingInvoice!==null){ renderInvoiceForm(); return; }
+  const outstanding=S.invoices.filter(i=>i.status==='unpaid').reduce((s,i)=>s+i.total,0);
+  const paid=S.invoices.filter(i=>i.status==='paid').reduce((s,i)=>s+i.total,0);
+  document.getElementById('content').innerHTML=`
+    <div class="grid3" style="margin-bottom:1rem">
+      <div class="mc"><div class="mc-label">Total invoiced</div><div class="mc-val">${C(outstanding+paid)}</div></div>
+      <div class="mc"><div class="mc-label">Outstanding</div><div class="mc-val amber">${C(outstanding)}</div></div>
+      <div class="mc"><div class="mc-label">Collected</div><div class="mc-val green">${C(paid)}</div></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><span class="card-title" style="margin:0">Invoices (${S.invoices.length})</span><button class="btn btn-primary btn-sm" onclick="editingInvoice='new';render_invoices()">+ New Invoice</button></div>
+      ${S.invoices.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Invoice #</th><th>Client</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>
+        ${S.invoices.map(i=>`<tr><td>${i.number}</td><td style="font-weight:600">${i.client}</td><td>${fdate(i.date)}</td><td style="font-weight:600">${C(i.total)}</td><td><span class="badge badge-${i.status==='paid'?'green':'amber'}">${i.status}</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-secondary" onclick="toggleInvoicePaid('${i.id}')">${i.status==='paid'?'Unmark':'Mark paid'}</button> <button class="btn btn-sm btn-danger" onclick="delInvoice('${i.id}')">Del</button></td></tr>`).join('')}
+      </tbody></table></div>`:'<div class="empty"><div class="empty-ico">📄</div><div class="empty-txt">No invoices yet. Create your first one.</div></div>'}
+    </div>`;
+}
+
+function renderInvoiceForm(){
+  const isNew=editingInvoice==='new';
+  const inv=isNew?{id:uid(),number:'INV-'+(String(S.invoices.length+1).padStart(4,'0')),client:'',date:today(),dueDate:'',notes:'',vatEnabled:true,items:[{desc:'',qty:1,price:0}],status:'unpaid',total:0}:S.invoices.find(i=>i.id===editingInvoice);
+  if(!inv){editingInvoice=null;render_invoices();return;}
+  window._inv=JSON.parse(JSON.stringify(inv));
+  if(isNew) window._inv.items=[{desc:'',qty:1,price:0}];
+  renderInvoiceEditor();
+}
+
+function renderInvoiceEditor(){
+  const inv=window._inv;
+  const subtotal=inv.items.reduce((s,it)=>s+(it.qty*it.price),0);
+  const vat=inv.vatEnabled?subtotal*0.16:0;
+  const total=subtotal+vat;
+  document.getElementById('content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="editingInvoice=null;render_invoices()">← Back</button>
+      <div style="font-size:15px;font-weight:700">${editingInvoice==='new'?'New Invoice':'Edit Invoice'}</div>
+    </div>
+    <div class="card">
+      <div class="inv-header"><div class="inv-title">INVOICE</div><div class="inv-sub">${S.bizName}</div></div>
+      <div class="frow">
+        <div class="field"><label>Invoice number</label><input type="text" id="inv-num" value="${inv.number}"/></div>
+        <div class="field"><label>Date</label><input type="date" id="inv-date" value="${inv.date}"/></div>
+        <div class="field"><label>Client / customer name</label><input type="text" id="inv-client" placeholder="e.g. ABC Company Ltd" value="${inv.client}"/></div>
+        <div class="field"><label>Due date</label><input type="date" id="inv-due" value="${inv.dueDate||''}"/></div>
+      </div>
+      <hr class="divider"/>
+      <div class="card-title">Line items</div>
+      <div id="inv-items">
+        ${inv.items.map((it,i)=>`<div class="frow" style="margin-bottom:6px;align-items:flex-end">
+          <div class="field" style="margin:0;flex:3"><label>Description</label><input type="text" class="inv-desc" data-i="${i}" placeholder="Product or service" value="${it.desc}" oninput="updInvItem(${i},'desc',this.value)"/></div>
+          <div class="field" style="margin:0;flex:1"><label>Qty</label><input type="number" class="inv-qty" data-i="${i}" value="${it.qty}" min="1" oninput="updInvItem(${i},'qty',this.value)"/></div>
+          <div class="field" style="margin:0;flex:2"><label>Unit price</label><input type="number" class="inv-price" data-i="${i}" value="${it.price}" min="0" oninput="updInvItem(${i},'price',this.value)"/></div>
+          <div style="padding-bottom:2px;flex-shrink:0"><button class="btn btn-danger btn-sm" onclick="removeInvItem(${i})">×</button></div>
+        </div>`).join('')}
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:4px" onclick="addInvItem()">+ Add item</button>
+      <hr class="divider"/>
+      <div style="max-width:280px;margin-left:auto">
+        <div class="pay-row"><span>Subtotal</span><span>${S.currency} ${Math.round(subtotal).toLocaleString()}</span></div>
+        <div class="pay-row"><span><label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="inv-vat" ${inv.vatEnabled?'checked':''} onchange="window._inv.vatEnabled=this.checked;renderInvoiceEditor()"> VAT (16%)</label></span><span>${S.currency} ${Math.round(vat).toLocaleString()}</span></div>
+        <div class="pay-row total"><span>TOTAL</span><span>${S.currency} ${Math.round(total).toLocaleString()}</span></div>
+      </div>
+      <div class="field" style="margin-top:1rem"><label>Notes (optional)</label><textarea id="inv-notes" placeholder="Payment terms, bank details, thank you note...">${inv.notes||''}</textarea></div>
+      <button class="btn btn-primary btn-full" style="margin-top:.5rem" onclick="saveInvoice()">Save Invoice</button>
+    </div>`;
+}
+
+function updInvItem(i,field,val){
+  if(!window._inv)return;
+  window._inv.items[i][field]=field==='desc'?val:parseFloat(val)||0;
+  const subtotal=window._inv.items.reduce((s,it)=>s+(it.qty*it.price),0);
+  const vat=window._inv.vatEnabled?subtotal*0.16:0;
+  const total=subtotal+vat;
+  // Update totals only
+  const rows=document.querySelectorAll('.pay-row');
+  if(rows[0]) rows[0].lastChild.textContent=S.currency+' '+Math.round(subtotal).toLocaleString();
+  if(rows[1]) rows[1].lastChild.textContent=S.currency+' '+Math.round(vat).toLocaleString();
+  if(rows[2]) rows[2].lastChild.textContent=S.currency+' '+Math.round(total).toLocaleString();
+}
+function addInvItem(){ window._inv.items.push({desc:'',qty:1,price:0}); renderInvoiceEditor(); }
+function removeInvItem(i){ if(window._inv.items.length===1){toast('Need at least one item');return;} window._inv.items.splice(i,1); renderInvoiceEditor(); }
+function saveInvoice(){
+  const inv=window._inv;
+  inv.number=document.getElementById('inv-num')?.value||inv.number;
+  inv.client=document.getElementById('inv-client')?.value||'';
+  inv.date=document.getElementById('inv-date')?.value||today();
+  inv.dueDate=document.getElementById('inv-due')?.value||'';
+  inv.notes=document.getElementById('inv-notes')?.value||'';
+  const subtotal=inv.items.reduce((s,it)=>s+(it.qty*it.price),0);
+  inv.total=inv.vatEnabled?subtotal*1.16:subtotal;
+  if(!inv.client.trim()){toast('Enter client name');return;}
+  if(editingInvoice==='new') S.invoices.unshift(inv);
+  else { const idx=S.invoices.findIndex(i=>i.id===inv.id); if(idx>=0)S.invoices[idx]=inv; }
+  saveAll(); editingInvoice=null; toast('Invoice saved!'); render_invoices();
+}
+function toggleInvoicePaid(id){
+  const inv=S.invoices.find(i=>i.id===id);
+  if(inv){ inv.status=inv.status==='paid'?'unpaid':'paid'; saveAll(); render_invoices(); }
+}
+function delInvoice(id){
+  if(!confirm('Delete invoice?'))return;
+  S.invoices=S.invoices.filter(i=>i.id!==id);
+  saveAll(); render_invoices();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════════════════════════
+function render_inventory(){
+  const totalVal=S.inventory.reduce((s,i)=>s+(i.qty*i.costPrice),0);
+  const totalRetail=S.inventory.reduce((s,i)=>s+(i.qty*i.sellingPrice),0);
+  const lowStock=S.inventory.filter(i=>i.qty<=i.reorder);
+  document.getElementById('content').innerHTML=`
+    <div class="grid3" style="margin-bottom:1rem">
+      <div class="mc"><div class="mc-label">Total items</div><div class="mc-val">${S.inventory.length}</div></div>
+      <div class="mc"><div class="mc-label">Cost value</div><div class="mc-val blue">${C(totalVal)}</div></div>
+      <div class="mc"><div class="mc-label">Retail value</div><div class="mc-val green">${C(totalRetail)}</div></div>
+    </div>
+    ${lowStock.length?`<div style="background:var(--rl);border-radius:var(--rads);padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;color:var(--r2);font-weight:600">⚠️ Low stock: ${lowStock.map(i=>i.name).join(', ')}</div>`:''}
+    <div class="card">
+      <div class="card-title">Add stock item</div>
+      <div class="frow">
+        <div class="field"><label>Item name</label><input type="text" id="inv-name" placeholder="e.g. Cement bags"/></div>
+        <div class="field"><label>Category</label><input type="text" id="inv-cat" placeholder="e.g. Building materials"/></div>
+        <div class="field"><label>Quantity</label><input type="number" id="inv-qty" placeholder="0" min="0"/></div>
+        <div class="field"><label>Reorder level</label><input type="number" id="inv-reorder" placeholder="5" min="0"/></div>
+        <div class="field"><label>Cost price (${S.currency})</label><input type="number" id="inv-cost" placeholder="0" min="0"/></div>
+        <div class="field"><label>Selling price (${S.currency})</label><input type="number" id="inv-sell" placeholder="0" min="0"/></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addInventory()">Add item</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Stock list (${S.inventory.length})</div>
+      ${S.inventory.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Cost price</th><th>Selling price</th><th>Margin</th><th>Value</th><th></th></tr></thead><tbody>
+        ${S.inventory.map(i=>{
+          const margin=i.sellingPrice>0?Math.round(((i.sellingPrice-i.costPrice)/i.sellingPrice)*100):0;
+          const low=i.qty<=i.reorder;
+          return `<tr><td><strong>${i.name}</strong>${low?` <span class="badge badge-red">Low</span>`:''}</td><td>${i.category}</td><td style="font-weight:600;color:${low?'var(--r)':'inherit'}">${i.qty}</td><td>${C(i.costPrice)}</td><td>${C(i.sellingPrice)}</td><td><span class="badge ${margin>=20?'badge-green':margin>0?'badge-amber':'badge-red'}">${margin}%</span></td><td style="font-weight:600">${C(i.qty*i.costPrice)}</td><td><button class="btn btn-sm btn-secondary" onclick="adjStock('${i.id}')">Adj</button> <button class="btn btn-sm btn-danger" onclick="delStock('${i.id}')">Del</button></td></tr>`;
+        }).join('')}
+      </tbody></table></div>`:'<div class="empty"><div class="empty-ico">📦</div><div class="empty-txt">No inventory items yet</div></div>'}
+    </div>`;
+}
+function addInventory(){
+  const name=(document.getElementById('inv-name')?.value||'').trim();
+  if(!name){toast('Enter item name');return;}
+  S.inventory.push({id:uid(),name,category:(document.getElementById('inv-cat')?.value||'General').trim(),qty:parseFloat(document.getElementById('inv-qty')?.value)||0,reorder:parseFloat(document.getElementById('inv-reorder')?.value)||5,costPrice:parseFloat(document.getElementById('inv-cost')?.value)||0,sellingPrice:parseFloat(document.getElementById('inv-sell')?.value)||0});
+  saveAll(); toast('Item added!'); render_inventory();
+}
+function adjStock(id){
+  const item=S.inventory.find(i=>i.id===id);
+  if(!item)return;
+  const n=prompt(`Adjust stock for "${item.name}"\nCurrent: ${item.qty}\nEnter new quantity:`,item.qty);
+  if(n===null||isNaN(n))return;
+  item.qty=Math.max(0,parseInt(n)||0);
+  saveAll(); render_inventory();
+}
+function delStock(id){
+  if(!confirm('Delete this item?'))return;
+  S.inventory=S.inventory.filter(i=>i.id!==id);
+  saveAll(); render_inventory();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAYROLL
+// ═══════════════════════════════════════════════════════════
+function calcEmployeePay(gross){
+  const nssf=Math.round(Math.min(gross,7000)*0.06+Math.max(0,Math.min(gross,36000)-7000)*0.06);
+  const shif=Math.round(gross*0.0275);
+  const taxable=gross-nssf;
+  let paye=0;
+  if(taxable>800000)paye+=(taxable-800000)*0.35;
+  if(taxable>500000)paye+=Math.min(taxable-500000,300000)*0.325;
+  if(taxable>32333)paye+=Math.min(taxable-32333,467667)*0.30;
+  if(taxable>24000)paye+=Math.min(taxable-24000,8333)*0.25;
+  paye+=Math.min(taxable,24000)*0.10;
+  paye=Math.max(0,Math.round(paye-2400));
+  const totalDed=paye+nssf+shif;
+  return {gross,paye,nssf,shif,totalDed,net:gross-totalDed};
+}
+
+function render_payroll(){
+  const totalGross=S.employees.reduce((s,e)=>s+e.gross,0);
+  const totalNet=S.employees.reduce((s,e)=>s+calcEmployeePay(e.gross).net,0);
+  const totalTax=S.employees.reduce((s,e)=>s+calcEmployeePay(e.gross).paye,0);
+  document.getElementById('content').innerHTML=`
+    <div class="grid3" style="margin-bottom:1rem">
+      <div class="mc"><div class="mc-label">Total payroll (gross)</div><div class="mc-val">${C(totalGross)}</div></div>
+      <div class="mc"><div class="mc-label">Total net pay</div><div class="mc-val green">${C(totalNet)}</div></div>
+      <div class="mc"><div class="mc-label">Total PAYE</div><div class="mc-val amber">${C(totalTax)}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Add employee</div>
+      <div class="frow">
+        <div class="field"><label>Full name</label><input type="text" id="emp-name" placeholder="e.g. John Kamau"/></div>
+        <div class="field"><label>Job title</label><input type="text" id="emp-role" placeholder="e.g. Sales Manager"/></div>
+        <div class="field"><label>National ID / Employee #</label><input type="text" id="emp-id" placeholder="e.g. 12345678"/></div>
+        <div class="field"><label>Gross monthly salary (${S.currency})</label><input type="number" id="emp-gross" placeholder="e.g. 50000" min="0"/></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addEmployee()">Add to payroll</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Payroll register (${S.employees.length} employees)</div>
+      ${S.employees.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Employee</th><th>Role</th><th>Gross</th><th>PAYE</th><th>NSSF</th><th>SHIF</th><th>Net Pay</th><th></th></tr></thead><tbody>
+        ${S.employees.map(e=>{
+          const p=calcEmployeePay(e.gross);
+          return `<tr><td><strong>${e.name}</strong><div style="font-size:11px;color:var(--g4)">${e.empId}</div></td><td>${e.role}</td><td>${C(p.gross)}</td><td style="color:var(--r)">${C(p.paye)}</td><td style="color:var(--r)">${C(p.nssf)}</td><td style="color:var(--r)">${C(p.shif)}</td><td style="font-weight:700;color:var(--p2)">${C(p.net)}</td><td><button class="btn btn-sm btn-danger" onclick="delEmployee('${e.id}')">Del</button></td></tr>`;
+        }).join('')}
+        <tr style="background:var(--g1)"><td colspan="2" style="font-weight:700">TOTALS</td><td style="font-weight:700">${C(totalGross)}</td><td style="font-weight:700;color:var(--r)">${C(totalTax)}</td><td style="font-weight:700;color:var(--r)">${C(S.employees.reduce((s,e)=>s+calcEmployeePay(e.gross).nssf,0))}</td><td style="font-weight:700;color:var(--r)">${C(S.employees.reduce((s,e)=>s+calcEmployeePay(e.gross).shif,0))}</td><td style="font-weight:700;color:var(--p2)">${C(totalNet)}</td><td></td></tr>
+      </tbody></table></div>`:'<div class="empty"><div class="empty-ico">👥</div><div class="empty-txt">No employees yet. Add your first one.</div></div>'}
+    </div>`;
+}
+function addEmployee(){
+  const name=(document.getElementById('emp-name')?.value||'').trim();
+  const gross=parseFloat(document.getElementById('emp-gross')?.value||0);
+  if(!name){toast('Enter employee name');return;}
+  if(!gross||gross<=0){toast('Enter valid salary');return;}
+  S.employees.push({id:uid(),name,role:(document.getElementById('emp-role')?.value||'').trim()||'Employee',empId:(document.getElementById('emp-id')?.value||'').trim()||'—',gross});
+  saveAll(); toast('Employee added!'); render_payroll();
+}
+function delEmployee(id){
+  if(!confirm('Remove employee from payroll?'))return;
+  S.employees=S.employees.filter(e=>e.id!==id);
+  saveAll(); render_payroll();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BALANCE SHEET
+// ═══════════════════════════════════════════════════════════
+function render_balance(){
+  const totalAssets=S.assets.reduce((s,a)=>s+a.value,0);
+  const totalLiab=S.liabilities.reduce((s,l)=>s+l.value,0);
+  const equity=totalAssets-totalLiab;
+  const curAssets=S.assets.filter(a=>a.type==='current').reduce((s,a)=>s+a.value,0);
+  const fixedAssets=S.assets.filter(a=>a.type==='fixed').reduce((s,a)=>s+a.value,0);
+  const curLiab=S.liabilities.filter(l=>l.type==='current').reduce((s,l)=>s+l.value,0);
+  const ltLiab=S.liabilities.filter(l=>l.type==='longterm').reduce((s,l)=>s+l.value,0);
+
+  document.getElementById('content').innerHTML=`
+    <div class="grid2" style="margin-bottom:1rem">
+      <div class="card">
+        <div class="card-title">Add asset</div>
+        <div class="field"><label>Asset name</label><input type="text" id="ast-name" placeholder="e.g. Business vehicle"/></div>
+        <div class="frow">
+          <div class="field"><label>Type</label><select id="ast-type"><option value="current">Current asset</option><option value="fixed">Fixed asset</option></select></div>
+          <div class="field"><label>Value (${S.currency})</label><input type="number" id="ast-val" placeholder="0" min="0"/></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addAsset()">Add asset</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Add liability</div>
+        <div class="field"><label>Liability name</label><input type="text" id="liab-name" placeholder="e.g. Bank loan"/></div>
+        <div class="frow">
+          <div class="field"><label>Type</label><select id="liab-type"><option value="current">Current liability</option><option value="longterm">Long-term liability</option></select></div>
+          <div class="field"><label>Amount (${S.currency})</label><input type="number" id="liab-val" placeholder="0" min="0"/></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addLiability()">Add liability</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="inv-header"><div class="inv-title">Balance Sheet</div><div class="inv-sub">${S.bizName} · As at ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+      <div class="grid2">
+        <div>
+          <div class="pl-row subtotal" style="background:var(--bl);color:var(--b)"><span>ASSETS</span><span></span></div>
+          <div class="pl-row indent" style="font-weight:600;color:var(--g5)"><span>Current assets</span><span></span></div>
+          ${S.assets.filter(a=>a.type==='current').map(a=>`<div class="pl-row indent" style="padding-left:1.5rem"><span>${a.name}</span><span>${C(a.value)}<button class="tx-del" onclick="delAsset('${a.id}')" style="margin-left:4px;font-size:13px">×</button></span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">None</span><span>—</span></div>'}
+          <div class="pl-row subtotal"><span>Total current assets</span><span>${C(curAssets)}</span></div>
+          <div class="pl-row indent" style="font-weight:600;color:var(--g5)"><span>Fixed assets</span><span></span></div>
+          ${S.assets.filter(a=>a.type==='fixed').map(a=>`<div class="pl-row indent" style="padding-left:1.5rem"><span>${a.name}</span><span>${C(a.value)}<button class="tx-del" onclick="delAsset('${a.id}')" style="margin-left:4px;font-size:13px">×</button></span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">None</span><span>—</span></div>'}
+          <div class="pl-row subtotal"><span>Total fixed assets</span><span>${C(fixedAssets)}</span></div>
+          <div class="pl-row total"><span>TOTAL ASSETS</span><span>${C(totalAssets)}</span></div>
+        </div>
+        <div>
+          <div class="pl-row subtotal" style="background:var(--rl);color:var(--r2)"><span>LIABILITIES & EQUITY</span><span></span></div>
+          <div class="pl-row indent" style="font-weight:600;color:var(--g5)"><span>Current liabilities</span><span></span></div>
+          ${S.liabilities.filter(l=>l.type==='current').map(l=>`<div class="pl-row indent" style="padding-left:1.5rem"><span>${l.name}</span><span>${C(l.value)}<button class="tx-del" onclick="delLiab('${l.id}')" style="margin-left:4px;font-size:13px">×</button></span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">None</span><span>—</span></div>'}
+          <div class="pl-row subtotal"><span>Total current liabilities</span><span>${C(curLiab)}</span></div>
+          <div class="pl-row indent" style="font-weight:600;color:var(--g5)"><span>Long-term liabilities</span><span></span></div>
+          ${S.liabilities.filter(l=>l.type==='longterm').map(l=>`<div class="pl-row indent" style="padding-left:1.5rem"><span>${l.name}</span><span>${C(l.value)}<button class="tx-del" onclick="delLiab('${l.id}')" style="margin-left:4px;font-size:13px">×</button></span></div>`).join('')||'<div class="pl-row indent"><span style="color:var(--g4)">None</span><span>—</span></div>'}
+          <div class="pl-row subtotal"><span>Total liabilities</span><span>${C(totalLiab)}</span></div>
+          <div class="pl-row subtotal" style="background:var(${equity>=0?'--pl':'--rl'});color:var(${equity>=0?'--p':'--r2'})"><span>OWNER'S EQUITY</span><span>${CS(equity)}</span></div>
+          <div class="pl-row total"><span>TOTAL LIAB + EQUITY</span><span>${C(totalAssets)}</span></div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding:.75rem;background:${Math.abs(totalAssets-(totalLiab+equity))<1?'var(--pl)':'var(--rl)'};border-radius:var(--rads);font-size:13px;color:${Math.abs(totalAssets-(totalLiab+equity))<1?'var(--p)':'var(--r2)'}">
+        ${Math.abs(totalAssets-(totalLiab+equity))<1?'✅ Balance sheet is balanced.':'⚠️ Balance sheet does not balance. Check your entries.'}
+      </div>
+    </div>`;
+}
+function addAsset(){
+  const name=(document.getElementById('ast-name')?.value||'').trim();
+  const val=parseFloat(document.getElementById('ast-val')?.value||0);
+  if(!name||!val){toast('Enter name and value');return;}
+  S.assets.push({id:uid(),name,type:document.getElementById('ast-type')?.value||'current',value:val});
+  saveAll(); toast('Asset added!'); render_balance();
+}
+function addLiability(){
+  const name=(document.getElementById('liab-name')?.value||'').trim();
+  const val=parseFloat(document.getElementById('liab-val')?.value||0);
+  if(!name||!val){toast('Enter name and amount');return;}
+  S.liabilities.push({id:uid(),name,type:document.getElementById('liab-type')?.value||'current',value:val});
+  saveAll(); toast('Liability added!'); render_balance();
+}
+function delAsset(id){ S.assets=S.assets.filter(a=>a.id!==id); saveAll(); render_balance(); }
+function delLiab(id){ S.liabilities=S.liabilities.filter(l=>l.id!==id); saveAll(); render_balance(); }
+
+// ═══════════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════════
+function render_reports(){
+  const inc=S.txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=S.txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=inc-exp;
+  const cogs=S.txs.filter(t=>t.type==='expense'&&t.category==='Cost of goods sold').reduce((s,t)=>s+t.amount,0);
+  const grossProfit=inc-cogs;
+  const grossMargin=inc>0?Math.round((grossProfit/inc)*100):0;
+  const netMargin=inc>0?Math.round((net/inc)*100):0;
+  const totalAssets=S.assets.reduce((s,a)=>s+a.value,0);
+  const totalLiab=S.liabilities.reduce((s,l)=>s+l.value,0);
+  const equity=totalAssets-totalLiab;
+  const invVal=S.inventory.reduce((s,i)=>s+(i.qty*i.costPrice),0);
+  const totalPayroll=S.employees.reduce((s,e)=>s+e.gross,0);
+  const invOutstanding=S.invoices.filter(i=>i.status==='unpaid').reduce((s,i)=>s+i.total,0);
+  const vatPayable=Math.max(0,Math.round(inc*0.16/1.16-exp*0.16/1.16));
+  const corpTax=net>0?Math.round(net*0.30):0;
+
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="inv-header"><div class="inv-title">Full Business Report</div><div class="inv-sub">${S.bizName} · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+      <div class="grid4" style="margin-bottom:1.25rem">
+        <div class="mc"><div class="mc-label">Revenue</div><div class="mc-val green">${Cfmt(inc)}</div></div>
+        <div class="mc"><div class="mc-label">Expenses</div><div class="mc-val red">${Cfmt(exp)}</div></div>
+        <div class="mc"><div class="mc-label">Net profit</div><div class="mc-val ${net>=0?'green':'red'}">${Cfmt(net)}</div></div>
+        <div class="mc"><div class="mc-label">Gross margin</div><div class="mc-val ${grossMargin>=40?'green':grossMargin>0?'amber':'red'}">${grossMargin}%</div></div>
+        <div class="mc"><div class="mc-label">Net margin</div><div class="mc-val ${netMargin>=10?'green':netMargin>0?'amber':'red'}">${netMargin}%</div></div>
+        <div class="mc"><div class="mc-label">Total assets</div><div class="mc-val blue">${Cfmt(totalAssets)}</div></div>
+        <div class="mc"><div class="mc-label">Owner's equity</div><div class="mc-val ${equity>=0?'green':'red'}">${Cfmt(equity)}</div></div>
+        <div class="mc"><div class="mc-label">Inventory value</div><div class="mc-val blue">${Cfmt(invVal)}</div></div>
+        <div class="mc"><div class="mc-label">Monthly payroll</div><div class="mc-val">${Cfmt(totalPayroll)}</div></div>
+        <div class="mc"><div class="mc-label">Outstanding invoices</div><div class="mc-val amber">${Cfmt(invOutstanding)}</div></div>
+        <div class="mc"><div class="mc-label">Est. VAT payable</div><div class="mc-val amber">${Cfmt(vatPayable)}</div></div>
+        <div class="mc"><div class="mc-label">Est. corp. tax (30%)</div><div class="mc-val amber">${Cfmt(corpTax)}</div></div>
+      </div>
+      <hr class="divider"/>
+      <button class="btn btn-dark btn-full" id="ai-report-btn" onclick="runAIReport()" ${!S.txs.length?'disabled':''}>
+        ${!S.txs.length?'Add transactions to enable AI report':'✦ Generate AI business health report'}
+      </button>
+      <div class="ai-box" id="ai-box"></div>
+    </div>`;
+}
+
+async function runAIReport(){
+  const btn=document.getElementById('ai-report-btn');
+  const box=document.getElementById('ai-box');
+  btn.disabled=true; btn.textContent='Generating report...';
+  box.style.display='block'; box.textContent='Analyzing your business data...';
+  const inc=S.txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=S.txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=inc-exp;
+  const catTotals={};
+  S.txs.filter(t=>t.type==='expense').forEach(t=>catTotals[t.category]=(catTotals[t.category]||0)+t.amount);
+  const topExp=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k}: ${S.currency} ${Math.round(v).toLocaleString()}`).join(', ');
+  const invVal=S.inventory.reduce((s,i)=>s+(i.qty*i.costPrice),0);
+  const totalPayroll=S.employees.reduce((s,e)=>s+e.gross,0);
+  const prompt=`You are a professional accountant and business advisor analyzing a Kenyan SME. Provide a concise, actionable business health report.
+
+FINANCIAL SUMMARY:
+- Revenue: ${S.currency} ${Math.round(inc).toLocaleString()}
+- Expenses: ${S.currency} ${Math.round(exp).toLocaleString()}
+- Net Profit/Loss: ${S.currency} ${Math.round(net).toLocaleString()}
+- Gross margin: ${inc>0?Math.round(((inc-S.txs.filter(t=>t.type==='expense'&&t.category==='Cost of goods sold').reduce((s,t)=>s+t.amount,0))/inc)*100):0}%
+- Top expenses: ${topExp||'none'}
+- Inventory value: ${S.currency} ${Math.round(invVal).toLocaleString()}
+- Monthly payroll: ${S.currency} ${Math.round(totalPayroll).toLocaleString()}
+- Outstanding invoices: ${S.invoices.filter(i=>i.status==='unpaid').length} unpaid
+- Employees: ${S.employees.length}
+
+Provide a structured report with these sections (plain text, no markdown symbols):
+
+BUSINESS HEALTH SCORE
+Give a score out of 10 and 2-sentence explanation.
+
+FINANCIAL ANALYSIS
+Key findings from the revenue, expenses and profit data.
+
+CASH FLOW STATUS
+Assessment of the business's cash position and collection.
+
+RISK AREAS
+2-3 specific financial risks or concerns.
+
+RECOMMENDATIONS
+4 specific, actionable steps for this business to improve performance.
+
+TAX PLANNING (KENYA)
+Brief note on key tax obligations based on the figures (VAT, PAYE, corporate tax).
+
+Keep it concise, specific, and practical. Speak as a trusted accountant.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    const text=d.content?.map(c=>c.text||'').join('')||'';
+    box.textContent=text||'Could not generate report. Try again.';
+  }catch(e){box.textContent='Report failed. Check your internet connection.';}
+  btn.disabled=false; btn.textContent='✦ Re-generate report';
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+loadAll();
+updateTopbar();
+render_dashboard();
+</script>
+</body>
+</html>
